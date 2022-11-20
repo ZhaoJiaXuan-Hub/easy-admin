@@ -1,0 +1,134 @@
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-sm6 layui-col-md3">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          访问量
+          <span class="layui-badge layui-badge-blue layuiadmin-badge">周</span>
+        </div>
+        <div class="layui-card-body layuiadmin-card-list">
+          <p class="layuiadmin-big-font">25,848</p>
+          <p>
+            总计访问量
+            <span class="layuiadmin-span-color">88万</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-sm6 layui-col-md3">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          销售额
+          <span class="layui-badge layui-badge-red layuiadmin-badge">月</span>
+        </div>
+        <div class="layui-card-body layuiadmin-card-list">
+          <p class="layuiadmin-big-font">￥33,555</p>
+          <p>
+            总销售额
+            <span class="layuiadmin-span-color">68万</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-sm6 layui-col-md3">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          订单量
+          <span class="layui-badge layui-badge-green layuiadmin-badge">日</span>
+        </div>
+        <div class="layui-card-body layuiadmin-card-list">
+
+          <p class="layuiadmin-big-font">1637</p>
+          <p>
+            总订单量
+            <span class="layuiadmin-span-color">344万</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-sm6 layui-col-md3">
+      <div class="layui-card">
+        <div class="layui-card-header">
+          新增用户
+          <i class="layui-icon layui-icon-tips"></i>
+        </div>
+        <div class="layui-card-body layuiadmin-card-list">
+
+          <p class="layuiadmin-big-font">125位</p>
+          <p>
+            总用户
+            <span class="layuiadmin-span-color">103422人</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-sm6" style="padding-bottom: 0;">
+      <div class="layui-row layui-col-space15">
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group" ew-href="page/system/user.html" ew-title="用户管理">
+            <i class="console-app-icon layui-icon layui-icon-group" style="font-size: 26px;padding-top: 3px;margin-right: 6px;"></i>
+            <div class="console-app-name">用户</div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-chart" style="color: #95de64;"></i>
+            <div class="console-app-name">分析</div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-cart" style="color: #ff9c6e;"></i>
+            <div class="console-app-name">商品</div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-form" style="color: #b37feb;font-size: 30px;"></i>
+            <div class="console-app-name">订单</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-sm6" style="padding-bottom: 0;">
+      <div class="layui-row layui-col-space15">
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-layer" style="color: #ffd666;font-size: 34px;"></i>
+            <div class="console-app-name">票据</div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-email" style="color: #5cdbd3;font-size: 36px;"></i>
+            <div class="console-app-name">消息</div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-note" style="color: #ff85c0;font-size: 28px;"></i>
+            <div class="console-app-name">标签</div>
+          </div>
+        </div>
+        <div class="layui-col-xs6 layui-col-sm3">
+          <div class="console-app-group">
+            <i class="console-app-icon layui-icon layui-icon-slider" style="color: #ffc069;"></i>
+            <div class="console-app-name">配置</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin', 'form', 'user'], function () {
+    var $ = layui.$
+            , setter = layui.setter
+            , admin = layui.admin
+            , form = layui.form
+            , router = layui.router()
+            , search = router.search;
+  });
+</script>

@@ -1,0 +1,246 @@
+<title>角色管理</title>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb" style="visibility: visible;">
+    <a lay-href="">主页</a><span lay-separator="">/</span>
+    <a>系统管理</a><span lay-separator="">/</span>
+    <a><cite>角色管理</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-tab layui-tab-brief">
+    <div class="layui-tab-content">
+      <form class="layui-form layui-form-pane" action>
+        <input placeholder="输入角色名称" autocomplete="off" class="layui-input layui-input-search table-tab-search-input" type="text" name="roleName">
+        <input placeholder="输入角色标识" autocomplete="off" class="layui-input layui-input-search table-tab-search-input" type="text" name="roleCode">
+        <input placeholder="输入角色备注" autocomplete="off" class="layui-input layui-input-search table-tab-search-input" type="text" name="comments">
+
+        <a class="layui-btn layui-btn-normal layui-btn-sm table-tab-search-btn" lay-submit="" lay-filter="table-search">查 询</a>
+
+        <button class="layui-btn layui-btn-primary layui-btn-sm table-tab-search-btn" type="reset">重置</button>
+      </form>
+    </div>
+    </div>
+  </div>
+  <div class="layui-card">
+    <div class="layui-tab layui-tab-brief">
+      <ul class="layui-tab-title">
+        <li class="layui-this">角色管理</li>
+      </ul>
+      <div class="layui-tab-content">
+        <table class="layui-hide" id="table-content-role" lay-filter="table-content-role"></table>
+
+        <script type="text/html" id="roleCode">
+          <span class="layui-badge layui-badge-blue">{{d.roleCode}}</span>
+        </script>
+
+        <script type="text/html" id="toolbar">
+          <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-1"></i>新建</button>
+            <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="getCheckLength"><i class="layui-icon layui-icon-delete"></i>删除</button>
+          </div>
+        </script>
+
+        <script type="text/html" id="operation-role">
+          <div class="ant-space ant-space-horizontal ant-space-align-center" style="gap: 8px;">
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn" lay-event="edit">修改</a>
+            </div>
+            <div class="ant-space-item">
+              <div class="ant-divider ant-divider-vertical"></div>
+            </div>
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn" lay-event="authority">分配权限</a>
+            </div>
+            <div class="ant-space-item">
+              <div class="ant-divider ant-divider-vertical"></div>
+            </div>
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn table-col-btn-danger" lay-event="del">删除</a>
+            </div>
+          </div>
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','table', 'form','tree'], function(){
+    var $ = layui.$
+        ,table = layui.table
+        ,admin = layui.admin
+        ,form = layui.form
+        ,view = layui.view
+        ,tree = layui.tree
+        ,layer = layui.layer
+        , setter = layui.setter;
+
+    table.render({
+      elem: '#table-content-role'
+      ,url: setter.server.url + 'system/role/pageRoles'
+      ,skin: 'line' //行边框风格
+      ,size: 'lg'
+      ,parseData: function(res){
+        return {
+          "code": res.code,
+          "msg": res.message,
+          "count": res.data.count,
+          "data": res.data.list
+        };
+      }
+      ,text: {
+        none: '<img class="empty-icon" alt="empty" src="res/style/imgs/empty.svg"><p>暂无相关数据</p>' //默认：无数据。
+      }
+      ,response: {
+        statusCode: setter.response.statusCode.ok
+        ,msgName: 'message'
+      }
+      ,toolbar: '#toolbar' //开启头部工具栏，并为其绑定左侧模板
+      ,title: '角色数据表'
+      ,cols: [[
+        {type: 'checkbox', fixed: 'left'}
+        ,{field:'roleId', title:'ID', width:80, fixed: 'left',align:'center', unresize: true, sort: true}
+        ,{field:'roleName', title:'角色名称', width:150}
+        ,{field:'roleCode', title:'角色标识', toolbar: '#roleCode', width:150}
+        ,{field:'comments', title:'备注', width:150}
+        ,{field:'createTime', title:'创建时间', sort: true}
+        ,{title:'操作', toolbar: '#operation-role',align:'center', width:250}
+      ]]
+      ,page: true
+    });
+
+    //头工具栏事件
+    table.on('toolbar(table-content-role)', function(obj){
+      let data = obj.data;
+      switch(obj.event){
+        case 'add':
+          admin.popup({
+            title: '添加角色'
+            ,area: '350px'
+            ,offset: '40px'
+            ,id: 'popup-content-role'
+            ,success: function(layer, index){
+              view(this.id).render('system/role/roleform',data).done(function(){
+                form.render(null, 'table-form-role');
+                //提交
+                form.on('submit(table-form-role-submit)', function(data){
+                  var field = data.field; //获取提交的字段
+                  admin.req({
+                    url: setter.server.url + 'system/role/add'
+                    , method: 'POST'
+                    , data: field
+                    , done: function (res) {
+                      layui.layer.msg(res[setter.response.msgName],{'icon':6});
+                      layui.table.reload('table-content-role'); //重载表格
+                      layui.layer.close(index); //执行关闭
+                    }
+                  });
+                });
+              });
+            }
+          });
+          break;
+      }
+    });
+
+    //监听行工具事件
+    table.on('tool(table-content-role)', function(obj){
+      let data = obj.data;
+      if(obj.event === 'del'){
+        layer.confirm('真的删除此行吗', function(index){
+          admin.req({
+            url: setter.server.url + 'system/role/del'
+            , method: 'POST'
+            , data: data
+            , done: function (res) {
+              layer.msg(res[setter.response.msgName],{'icon':6});
+              layui.table.reload('table-content-role'); //重载表格
+              layer.close(index); //执行关闭
+            }
+          });
+        });
+      } else if(obj.event === 'edit'){
+        admin.popup({
+          title: '编辑角色'
+          ,id: 'popup-content-role'
+          ,area: '350px'
+          ,offset: '40px'
+          ,success: function(layer, index){
+            view(this.id).render('system/role/roleform',data).done(function(){
+              form.render(null, 'table-form-role');
+              //提交
+              form.on('submit(table-form-role-submit)', function(res){
+                var field = res.field; //获取提交的字段
+                field.roleId = data.roleId;
+                admin.req({
+                  url: setter.server.url + 'system/role/edit'
+                  , method: 'POST'
+                  , data: field
+                  , done: function (arr) {
+                    layui.layer.msg(arr[setter.response.msgName], {icon:6});
+                    layui.table.reload('table-content-role'); //重载表格
+                    layui.layer.close(index); //执行关闭
+                  }
+                });
+              });
+            });
+          }
+        });
+      } else if(obj.event === 'authority'){
+        admin.popup({
+          title: '分配权限'
+          ,area: '350px'
+          ,offset: '40px'
+          ,id: 'popup-content-authority'
+          ,success: function(layer, index){
+            view(this.id).render('system/role/authority',data).done(function(){
+              form.render(null, 'table-form-authority');
+              admin.req({
+                url: setter.server.url + 'system/roleRouters/listRouters'
+                , method: 'GET'
+                , data: data
+                , done: function (res) {
+                  tree.render({
+                    elem: '#list'  //绑定元素
+                    ,data: res[setter.response.dataName]
+                    ,showCheckbox: true
+                  });
+                }
+              });
+              //提交
+              form.on('submit(table-form-authority-submit)', function(res){
+                var field = res.field; //获取提交的字段
+                field.roleId = data.roleId;
+                admin.req({
+                  url: setter.server.url + 'system/roleRouters/updateRoleMenus'
+                  , method: 'POST'
+                  , data: field
+                  , done: function (arr) {
+                    layui.layer.msg(arr[setter.response.msgName], {icon:6});
+                    layui.table.reload('table-content-role'); //重载表格
+                    layui.layer.close(index); //执行关闭
+                  }
+                });
+              });
+            });
+          }
+        });
+      }
+    });
+    /**
+     * 字段搜索
+     */
+    form.on('submit(table-search)', function(res){
+      var field = res.field; //获取提交的字段
+      //执行重载
+      table.reload('table-content-role', {
+        url: setter.server.url + 'system/role/pageRoles'
+        ,methods:"post"
+        ,where: field
+        ,page: {
+          curr: 1
+        }
+      });
+    });
+  });
+</script>

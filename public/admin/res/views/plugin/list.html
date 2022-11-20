@@ -1,0 +1,196 @@
+<title>插件列表</title>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-tab layui-tab-brief" lay-filter="typeTabs">
+            <ul class="layui-tab-title">
+                <li class="layui-this" lay-type="all">全部类型</li>
+                <li lay-type="pay">支付插件</li>
+                <li lay-type="tool">工具插件</li>
+            </ul>
+            <div class="layui-tab-content">
+                <table class="layui-hide" id="table-content-plugin" lay-filter="table-content-plugin"></table>
+
+                <script type="text/html" id="author">
+                    <a class="layui-btn layui-btn-sm table-col-btn" href="{{d.url}}">{{d.author}}</a>
+                </script>
+
+                <script type="text/html" id="name">
+                    <span class="ant-avatar ant-avatar-circle ant-avatar-image"><img draggable="false"
+                                                                                     src="{{d.icon}}"
+                                                                                     style="height: 30px;border-radius: 4px;">{{d.name}}</span>
+                </script>
+
+                <script type="text/html" id="fileName">
+                    <span class="layui-badge-rim">{{d.fileName}}.php</span>
+                </script>
+
+                <script type="text/html" id="version">
+                    <span class="layui-badge-rim">{{d.version}}</span>
+                </script>
+
+                <script type="text/html" id="type">
+                    {{#if (d.type == 'pay') { }}
+                    <span class="layui-badge layui-badge-blue">支付插件</span>
+                    {{# }else if(d.type == 'tool'){ }}
+                    <span class="layui-badge layui-badge-green">工具插件</span>
+                    {{# } }}
+                </script>
+
+                <script type="text/html" id="operation-user">
+                    <div class="ant-space ant-space-horizontal ant-space-align-center" style="gap: 8px;">
+                        <div class="ant-space-item">
+                            <a class="layui-btn layui-btn-sm table-col-btn" lay-event="edit">配置插件</a>
+                        </div>
+                    </div>
+                </script>
+
+                <script type="text/html" id="status">
+                    <input type="checkbox" name="status" p-id="{{d.id}}" status="{{d.status}}" lay-skin="switch"
+                           lay-filter="status" {{#if (d.status== 1) { }}checked{{# } }} lay-text="开启|关闭">
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin', 'table', 'form', 'treetable', 'iconPicker', 'laytpl','element'], function () {
+        var $ = layui.$
+            , table = layui.table
+            , iconPicker = layui.iconPicker
+            , admin = layui.admin
+            , form = layui.form
+            , view = layui.view
+            , element = layui.element
+            , laytpl = layui.laytpl
+            , tree = layui.tree
+            , layer = layui.layer
+            , treetable = layui.treetable
+            , setter = layui.setter;
+        form.render();
+        table.render({
+            elem: '#table-content-plugin'
+            , url: setter.server.url + 'system/plugins/list'
+            , skin: 'line' //行边框风格
+            , size: 'lg'
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.message,
+                    "data": res.data
+                };
+            }
+            , text: {
+                none: '<img class="empty-icon" alt="empty" src="/res/style/imgs/empty.svg"><p>暂无相关数据</p>' //默认：无数据。
+            }
+            , response: {
+                statusCode: setter.response.statusCode.ok
+                , msgName: 'message'
+            }
+            , title: '插件列表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'name', title: '插件名称', toolbar: '#name', width: 170, align: "center"}
+                , {field: 'des', title: '插件描述', width: 200}
+                , {field: 'author', title: '作者信息', width: 150, toolbar: '#author', align: "center"}
+                , {field: 'fileName', title: '插件文件', width: 180, toolbar: '#fileName', align: "center"}
+                , {field: 'version', title: '插件版本', toolbar: '#version', width: 120, align: "center"}
+                , {field: 'type', title: '类型', toolbar: '#type', width: 120, align: "center"}
+                , {field: 'status', title: '状态', toolbar: '#status', align: 'center', width: 120}
+                , {field: 'createTime', title: '创建时间'}
+                , {title: '操作', toolbar: '#operation-user', align: 'center', width: 100}
+            ]]
+        });
+
+        //监听行工具事件
+        table.on('tool(table-content-plugin)', function (obj) {
+            let data = obj.data;
+            if (obj.event === 'edit') {
+                admin.popup({
+                    title: '配置插件'
+                    , area: '350px'
+                    , offset: '40px'
+                    , id: 'popup-content-plugin'
+                    , success: function (layer, index) {
+                        view(this.id).render('plugin/edit', data).done(function () {
+                            form.render(null, 'table-form-plugin');
+                            /**
+                             * 上级ID选择器
+                             */
+                            admin.req({
+                                url: setter.server.url + 'system/plugins/getInputList'
+                                , method: 'GET'
+                                , data: {
+                                    'name':data.fileName
+                                }
+                                , done: function (res) {
+                                    var data = {
+                                        'data': obj.data.data,
+                                        'list': res[setter.response.dataName]
+                                    }
+                                    var getTpl = inputs.innerHTML
+                                        , view = document.getElementById('view');
+                                    laytpl(getTpl).render(data, function (html) {
+                                        view.innerHTML = html;
+                                    });
+                                    form.render();
+                                }
+                            });
+                            //提交
+                            form.on('submit(table-form-plugin-submit)', function (data) {
+                                var field = {
+                                    'id':obj.data.id,
+                                    'data':data.field
+                                }; //获取提交的字段
+                                admin.req({
+                                    url: setter.server.url + 'system/plugins/editData'
+                                    , method: 'POST'
+                                    , data: field
+                                    , done: function (res) {
+                                        layui.layer.msg(res[setter.response.msgName], {'icon': 6});
+                                        layui.table.reload('table-content-plugin'); //重载表格
+                                        layui.layer.close(index); //执行关闭
+                                    }
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        });
+        form.on('switch(status)', function (obj) {
+            let status;
+            if ($(this).attr('status') == 0) {
+                status = 1
+            } else {
+                status = 0
+            }
+            let data = {
+                'id': $(this).attr('p-id'),
+                'status': status
+            }
+            admin.req({
+                url: setter.server.url + 'system/plugins/status'
+                , method: 'POST'
+                , data: data
+                , done: function (arr) {
+                    layui.layer.msg(arr[setter.response.msgName], {icon: 6});
+                    layui.table.reload('table-content-plugin'); //重载表格
+                }
+            });
+        });
+        /**
+         * 类型切换
+         */
+        element.on('tab(typeTabs)', function(){
+            let type = this.getAttribute('lay-type');
+            let data = {
+                "type"  :   type
+            }
+            table.reload('table-content-plugin', {
+                url: setter.server.url + 'system/plugins/list'
+                , methods: "post"
+                , where: data
+            });
+        });
+    });
+</script>

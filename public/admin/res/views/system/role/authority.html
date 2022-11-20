@@ -1,0 +1,11 @@
+
+<div class="layui-form layui-form-pane" lay-filter="table-form-authority" id="table-form-authority">
+  <div class="layui-form-item">
+    <script type="text/html" template>
+      <input type="hidden" name="roleId" id="roleId" value="{{d.params.roleId}}">
+    </script>
+    <div id="list" style="height: 350px;overflow: scroll;border: 1px solid #f0f0f0;border-radius: 4px;"></div>
+  </div>
+  <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="table-form-authority-submit">立即提交</button>
+  <button lay-submit="" id="load" lay-filter="load-data" style="display: none;"></button>
+</div>

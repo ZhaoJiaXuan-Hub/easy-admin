@@ -1,0 +1,117 @@
+<title>登录日志</title>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb" style="visibility: visible;">
+    <a lay-href="">主页</a><span lay-separator="">/</span>
+    <a>系统管理</a><span lay-separator="">/</span>
+    <a><cite>登录日志</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-tab layui-tab-brief">
+      <div class="layui-tab-content">
+        <form class="layui-form layui-form-pane" action>
+          <input placeholder="输入用户名" autocomplete="off" class="layui-input layui-input-search table-tab-search-input" type="text" name="username">
+          <input placeholder="输入IP地址" autocomplete="off" class="layui-input layui-input-search table-tab-search-input" type="text" name="ip">
+          <input placeholder="请选择登录时间范围" autocomplete="off"
+                 class="layui-input layui-input-search table-tab-search-input" type="text" name="createTime" id="createTime">
+          <a class="layui-btn layui-btn-normal layui-btn-sm table-tab-search-btn" lay-submit="" lay-filter="table-search">查 询</a>
+
+          <button class="layui-btn layui-btn-primary layui-btn-sm table-tab-search-btn" type="reset">重置</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="layui-card">
+    <div class="layui-tab layui-tab-brief">
+      <ul class="layui-tab-title">
+        <li class="layui-this">登录日志</li>
+      </ul>
+      <div class="layui-tab-content">
+        <table class="layui-hide" id="table-content-login-log" lay-filter="table-content-login-log"></table>
+
+        <script type="text/html" id="username">
+          <div class="ant-space ant-space-horizontal ant-space-align-center" style="gap: 8px;">
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn table-col-btn-danger">[{{d.userId}}]</a>
+            </div>
+            <div class="ant-space-item">
+              <div class="ant-divider ant-divider-vertical"></div>
+            </div>
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn">{{d.username}}</a>
+            </div>
+          </div>
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','table', 'form','tree','laydate'], function(){
+    var $ = layui.$
+            ,table = layui.table
+            ,admin = layui.admin
+            ,form = layui.form
+            ,view = layui.view
+            ,tree = layui.tree
+            , laydate = layui.laydate
+            ,layer = layui.layer
+            , setter = layui.setter;
+
+    table.render({
+      elem: '#table-content-login-log'
+      ,url: setter.server.url + 'system/loginLog/page'
+      ,skin: 'line' //行边框风格
+      ,size: 'lg'
+      ,parseData: function(res){
+        return {
+          "code": res.code,
+          "msg": res.message,
+          "count": res.data.count,
+          "data": res.data.list
+        };
+      }
+      ,text: {
+        none: '<img class="empty-icon" alt="empty" src="res/style/imgs/empty.svg"><p>暂无相关数据</p>' //默认：无数据。
+      }
+      ,response: {
+        statusCode: setter.response.statusCode.ok
+        ,msgName: 'message'
+      }
+      ,toolbar: null //开启头部工具栏，并为其绑定左侧模板
+      ,title: '角色数据表'
+      ,cols: [[
+        {type: 'checkbox', fixed: 'left'}
+        ,{field:'id', title:'ID', width:80, fixed: 'left',align:'center', unresize: true, sort: true}
+        ,{field:'username', title:'[UID] 用户名', toolbar: '#username', width:150}
+        ,{field:'ip', title:'IP', width:150,align:'center'}
+        ,{field:'osName', title:'操作系统', width:150,align:'center'}
+        ,{field:'browser', title:'浏览器', width:150,align:'center'}
+        ,{field:'city', title:'城市', width:150,align:'center'}
+        ,{field:'createTime', title:'登录时间', sort: true}
+      ]]
+      ,page: true
+    });
+    laydate.render({
+      elem: '#createTime'
+      ,type: 'datetime'
+      ,range: '到'
+    });
+    /**
+     * 字段搜索
+     */
+    form.on('submit(table-search)', function(res){
+      var field = res.field; //获取提交的字段
+      //执行重载
+      table.reload('table-content-login-log', {
+        url: setter.server.url + 'system/loginLog/page'
+        ,methods:"post"
+        ,where: field
+        ,page: {
+          curr: 1
+        }
+      });
+    });
+  });
+</script>

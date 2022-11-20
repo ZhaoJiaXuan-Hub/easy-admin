@@ -1,0 +1,28 @@
+
+<div class="layui-form layui-form-pane" lay-filter="table-form-role" id="table-form-role">
+  <div class="layui-form-item">
+    <label class="layui-form-label">角色名称</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" name="roleName" value="{{= d.params.roleName || '' }}" lay-verify="required" autocomplete="off" placeholder="请输入角色名称" class="layui-input">
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">角色标识</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" name="roleCode" value="{{= d.params.roleCode || '' }}" lay-verify="required" autocomplete="off" placeholder="请输入角色标识" class="layui-input">
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">角色描述</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" name="comments" value="{{= d.params.comments || '' }}" lay-verify="required" autocomplete="off" placeholder="请输入角色描述" class="layui-input">
+      </script>
+    </div>
+  </div>
+  <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="table-form-role-submit">立即提交</button>
+</div>

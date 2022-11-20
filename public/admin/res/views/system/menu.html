@@ -1,0 +1,378 @@
+<title>菜单权限</title>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb" style="visibility: visible;">
+    <a lay-href="">主页</a><span lay-separator="">/</span>
+    <a>系统管理</a><span lay-separator="">/</span>
+    <a><cite>菜单权限</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-tab layui-tab-brief">
+      <div class="layui-tab-content">
+        <form class="layui-form layui-form-pane" action>
+          <input placeholder="输入关键字" autocomplete="off" class="layui-input layui-input-search table-tab-search-input" type="text" name="keyword">
+
+          <a class="layui-btn layui-btn-normal layui-btn-sm table-tab-search-btn" lay-submit lay-filter="power-query">查 询</a>
+          <button class="layui-btn layui-btn-primary layui-btn-sm table-tab-search-btn" type="reset">重置</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="layui-card">
+    <div class="layui-tab layui-tab-brief">
+      <ul class="layui-tab-title">
+        <li class="layui-this">菜单权限</li>
+      </ul>
+      <div class="layui-tab-content">
+        <table id="power-table" lay-filter="power-table"></table>
+        <script type="text/html" id="power-toolbar">
+          <button class="layui-btn layui-btn-sm" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"></i>
+            新增
+          </button>
+        </script>
+
+        <script type="text/html" id="power-bar">
+          <div class="ant-space ant-space-horizontal ant-space-align-center" style="gap: 8px;">
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn" lay-event="add">新增</a>
+            </div>
+            <div class="ant-space-item">
+              <div class="ant-divider ant-divider-vertical"></div>
+            </div>
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn" lay-event="edit">修改</a>
+            </div>
+            <div class="ant-space-item">
+              <div class="ant-divider ant-divider-vertical"></div>
+            </div>
+            <div class="ant-space-item">
+              <a class="layui-btn layui-btn-sm table-col-btn table-col-btn-danger" lay-event="del">删除</a>
+            </div>
+          </div>
+        </script>
+
+        <script type="text/html" id="type">
+          {{#if (d.type == '0') { }}
+          <span class="layui-badge layui-badge-blue">菜单</span>
+          {{# }else if(d.type == '1'){ }}
+          <span class="layui-badge layui-badge-green">接口</span>
+          {{# } }}
+        </script>
+
+        <script type="text/html" id="hide">
+          {{#if (d.hide == '0') { }}
+          <span class="layui-badge-dot layui-bg-green"></span> 可见
+          {{# }else if(d.hide == '1'){ }}
+          <span class="layui-badge-dot layui-bg-orange"></span> 不可见
+          {{# } }}
+        </script>
+
+        <script type="text/html" id="icon">
+          <i class="layui-icon {{d.icon}}"></i>
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  layui.use(['admin','table', 'form','treetable','iconPicker','laytpl'], function(){
+    var $ = layui.$
+        ,table = layui.table
+        ,iconPicker = layui.iconPicker
+        ,admin = layui.admin
+        ,form = layui.form
+        ,view = layui.view
+        ,laytpl = layui.laytpl
+        ,tree = layui.tree
+        ,layer = layui.layer
+        ,treetable = layui.treetable
+        , setter = layui.setter;
+
+    treetable.render({
+      treeColIndex: 1,
+      treeSpid: 0,
+      treeIdName: 'menuId',
+      treePidName: 'parentId',
+      skin:'line',
+      treeDefaultClose: false,
+      toolbar:'#power-toolbar',
+      size: 'lg',
+      defaultToolbar: [{
+        title: '展开' //标题
+        ,layEvent: 'expandAll' //事件名，用于 toolbar 事件中使用
+        ,icon: 'layui-icon-spread-left' //图标类名
+      },{
+        title: '折叠' //标题
+        ,layEvent: 'foldAll' //事件名，用于 toolbar 事件中使用
+        ,icon: 'layui-icon-shrink-right' //图标类名
+      }],
+      elem: '#power-table',
+      url: setter.server.url + 'system/router/menuList',
+      page: false,
+      cols: [
+        [
+          {type: 'checkbox'},
+          {field: 'title', minWidth: 200, title: '权限名称'},
+          {field: 'icon', title: '图标',templet:'#icon',align:'center', width: 80},
+          {field: 'path', title: '路由地址'},
+          {field: 'authority', title: '接口地址'},
+          {field: 'type', title: '权限类型',templet:'#type',align:'center', width: 150},
+          {field: 'hide', title: '是否可见',templet:'#hide',align:'center', width: 150},
+          {title: '操作',templet: '#power-bar', width: 250, align: 'center'}
+        ]
+      ]
+    });
+
+    table.on('tool(power-table)',function(obj){
+      if (obj.event === 'del') {
+        window.del(obj);
+      } else if (obj.event === 'edit') {
+        window.edit(obj);
+      } else if (obj.event === 'add') {
+        window.add(obj);
+      }
+    })
+
+    table.on('toolbar(power-table)', function(obj){
+      let data = obj.data;
+      if(obj.event === 'add'){
+        admin.popup({
+          title: '添加菜单'
+          ,area: '380px'
+          ,offset: '40px'
+          ,id: 'popup-content-menu'
+          ,success: function(layer, index){
+            view(this.id).render('system/menu/menuform',data).done(function(){
+              form.render(null, 'table-form-menu');
+              /**
+               * 上级ID选择器
+               */
+              admin.req({
+                url: setter.server.url + 'system/router/menuList'
+                , method: 'POST'
+                , data: null
+                , done: function (res) {
+                  var data = {
+                    'pid':undefined,
+                    'list':res[setter.response.dataName]
+                  }
+                  var getTpl = menus.innerHTML
+                          ,view = document.getElementById('view');
+                  laytpl(getTpl).render(data, function(html){
+                    view.innerHTML = html;
+                  });
+                  form.render();
+                }
+              });
+              /**
+               * 初始化图标选择器
+               */
+              iconPicker.render({
+                // 选择器，推荐使用input
+                elem: '#iconPicker',
+                // 数据类型：fontClass/unicode，推荐使用fontClass
+                type: 'fontClass',
+                // 是否开启搜索：true/false，默认true
+                search: true,
+                // 是否开启分页：true/false，默认true
+                page: true,
+                // 每页显示数量，默认12
+                limit: 16,
+                // 点击回调
+                click: function(data) {
+                },
+                // 渲染成功后的回调
+                success: function(d) {
+                }
+              });
+              //提交
+              form.on('submit(table-form-menu-submit)', function(data){
+                var field = data.field; //获取提交的字段
+                admin.req({
+                  url: setter.server.url + 'system/router/add'
+                  , method: 'POST'
+                  , data: field
+                  , done: function (res) {
+                    layui.layer.msg(res[setter.response.msgName],{'icon':6});
+                    treetable.reload("#power-table");
+                    layui.layer.close(index); //执行关闭
+                  }
+                });
+              });
+            });
+          }
+        });
+      } else if(obj.event === 'expandAll'){
+        treetable.expandAll("#power-table");
+      } else if(obj.event === 'foldAll'){
+        treetable.foldAll("#power-table");
+      }
+    });
+
+    form.on('submit(power-query)', function(data) {
+      var keyword = data.field.keyword;
+      treetable.search('#power-table',keyword);
+      return false;
+    });
+
+    window.edit = function(obj){
+      let data = obj.data;
+      admin.popup({
+        title: '编辑菜单'
+        ,area: '380px'
+        ,offset: '40px'
+        ,id: 'popup-content-menu'
+        ,success: function(layer, index){
+          view(this.id).render('system/menu/menuform',data).done(function(){
+            form.render(null, 'table-form-menu');
+            /**
+             * 上级ID选择器
+             */
+            admin.req({
+              url: setter.server.url + 'system/router/menuList'
+              , method: 'POST'
+              , data: null
+              , done: function (res) {
+                var data = {
+                  'pid':obj.data.parentId,
+                  'list':res[setter.response.dataName]
+                }
+                var getTpl = menus.innerHTML
+                        ,view = document.getElementById('view');
+                laytpl(getTpl).render(data, function(html){
+                  view.innerHTML = html;
+                });
+                form.render();
+              }
+            });
+            /**
+             * 初始化图标选择器
+             */
+            iconPicker.render({
+              // 选择器，推荐使用input
+              elem: '#iconPicker',
+              // 数据类型：fontClass/unicode，推荐使用fontClass
+              type: 'fontClass',
+              // 是否开启搜索：true/false，默认true
+              search: true,
+              // 是否开启分页：true/false，默认true
+              page: true,
+              // 每页显示数量，默认12
+              limit: 16,
+              // 点击回调
+              click: function(data) {
+              },
+              // 渲染成功后的回调
+              success: function(d) {
+              }
+            });
+            //提交
+            form.on('submit(table-form-menu-submit)', function(arr){
+              var field = arr.field; //获取提交的字段
+              field.menuId = data.menuId;
+              console.log(field)
+              admin.req({
+                url: setter.server.url + 'system/router/edit'
+                , method: 'POST'
+                , data: field
+                , done: function (res) {
+                  layui.layer.msg(res[setter.response.msgName],{'icon':6});
+                  treetable.reload("#power-table");
+                  layui.layer.close(index); //执行关闭
+                }
+              });
+            });
+          });
+        }
+      });
+    }
+
+    window.add = function(obj){
+      let data = obj.data;
+      admin.popup({
+        title: '添加菜单'
+        ,area: '380px'
+        ,offset: '40px'
+        ,id: 'popup-content-menu'
+        ,success: function(layer, index){
+          view(this.id).render('system/menu/menuform',null).done(function(){
+            form.render(null, 'table-form-menu');
+            /**
+             * 上级ID选择器
+             */
+            admin.req({
+              url: setter.server.url + 'system/router/menuList'
+              , method: 'POST'
+              , data: null
+              , done: function (res) {
+                var data = {
+                  'pid':obj.data.menuId,
+                  'list':res[setter.response.dataName]
+                }
+                var getTpl = menus.innerHTML
+                        ,view = document.getElementById('view');
+                laytpl(getTpl).render(data, function(html){
+                  view.innerHTML = html;
+                });
+                form.render();
+              }
+            });
+            /**
+             * 初始化图标选择器
+             */
+            iconPicker.render({
+              // 选择器，推荐使用input
+              elem: '#iconPicker',
+              // 数据类型：fontClass/unicode，推荐使用fontClass
+              type: 'fontClass',
+              // 是否开启搜索：true/false，默认true
+              search: true,
+              // 是否开启分页：true/false，默认true
+              page: true,
+              // 每页显示数量，默认12
+              limit: 16,
+              // 点击回调
+              click: function(data) {
+              },
+              // 渲染成功后的回调
+              success: function(d) {
+              }
+            });
+            //提交
+            form.on('submit(table-form-menu-submit)', function(data){
+              var field = data.field; //获取提交的字段
+              admin.req({
+                url: setter.server.url + 'system/router/add'
+                , method: 'POST'
+                , data: field
+                , done: function (res) {
+                  layui.layer.msg(res[setter.response.msgName],{'icon':6});
+                  treetable.reload("#power-table");
+                  layui.layer.close(index); //执行关闭
+                }
+              });
+            });
+          });
+        }
+      });
+    }
+
+    window.del = function(obj){
+      layer.confirm('确定要删除该权限', {icon: 3, title:'提示'}, function(index){
+        layer.close(index);
+        admin.req({
+          url: setter.server.url + 'system/router/del'
+          , method: 'POST'
+          , data: obj.data
+          , done: function (res) {
+            layer.msg(res[setter.response.msgName],{'icon':6});
+            treetable.reload("#power-table");
+            layer.close(index); //执行关闭
+          }
+        });
+      });
+    }
+  });
+</script>

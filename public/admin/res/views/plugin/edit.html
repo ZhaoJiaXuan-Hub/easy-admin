@@ -1,0 +1,24 @@
+
+<script id="inputs" type="text/html">
+  {{#  layui.each(d.list, function(index, item){ }}
+    {{# if(item.type=="text"){ }}
+      <div class="layui-form-item">
+        <label class="layui-form-label">{{item.key}}</label>
+        <div class="layui-input-block">
+          <input type="text" name="{{index}}" autocomplete="off" value="{{d.data[index]}}" placeholder="{{ item.placeholder }}" class="layui-input">
+        </div>
+      </div>
+    {{# }else if(item.type=="textarea"){ }}
+        <div class="layui-form-item layui-form-text">
+          <label class="layui-form-label">{{item.key}}</label>
+        <div class="layui-input-block">
+          <textarea placeholder="{{ item.placeholder }}" name="{{index}}" class="layui-textarea">{{d.data[index]}}</textarea>
+        </div>
+      </div>
+    {{# } }}
+  {{#  }); }}
+</script>
+<div class="layui-form layui-form-pane" lay-filter="table-form-plugin" id="table-form-plugin">
+  <div id="view"></div>
+  <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="table-form-plugin-submit">立即提交</button>
+</div>

@@ -1,0 +1,204 @@
+<title>订单管理</title>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb" style="visibility: visible;">
+        <a lay-href="">主页</a><span lay-separator="">/</span>
+        <a>应用管理</a><span lay-separator="">/</span>
+        <a><cite>订单管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-tab layui-tab-brief">
+            <div class="layui-tab-content">
+                <form class="layui-form layui-form-pane" action>
+                    <input placeholder="输入订单号" autocomplete="off"
+                           class="layui-input layui-input-search table-tab-search-input" type="text" name="id">
+                    <input placeholder="输入交易号" autocomplete="off"
+                           class="layui-input layui-input-search table-tab-search-input" type="text" name="trade_no">
+                    <select name="status" class="layui-input layui-input-search table-tab-search-input" lay-ignore>
+                        <option value="">请选择订单状态</option>
+                        <option value="0">等待支付</option>
+                        <option value="1">已支付</option>
+                        <option value="2">交易完成</option>
+                    </select>
+                    <input placeholder="请选择创建时间范围" autocomplete="off"
+                           class="layui-input layui-input-search table-tab-search-input" type="text" name="createTime" id="createTime">
+                    <a class="layui-btn layui-btn-normal layui-btn-sm table-tab-search-btn" lay-submit=""
+                       lay-filter="table-search">查 询</a>
+
+                    <button class="layui-btn layui-btn-primary layui-btn-sm table-tab-search-btn" type="reset">重置
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-tab layui-tab-brief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">订单管理</li>
+            </ul>
+            <div class="layui-tab-content">
+                <table class="layui-hide" id="table-content-order" lay-filter="table-content-order"></table>
+                <script type="text/html" id="status">
+                    {{# if(d.status==0){}}
+                    <span class="layui-badge-rim">等待支付</span>
+                    {{# }else if(d.status==1){}}
+                    <span class="layui-badge layui-badge-blue">支付成功</span>
+                    {{#}else if(d.status==2){}}
+                    <span class="layui-badge layui-badge-green">交易完成</span>
+                    {{#}else if(d.status==3){}}
+                    <span class="layui-badge layui-badge-red">交易失败</span>
+                    {{#}}}
+                </script>
+
+                <script type="text/html" id="money">
+                    <span style="color: #ff4d4f;font-weight: 600;">{{d.money}} 元</span>
+                </script>
+
+                <script type="text/html" id="type">
+                    <span class="layui-badge-rim">{{d.type}}</span>
+                </script>
+
+                <script type="text/html" id="plugin">
+                    <span class="layui-badge-rim">{{d.plugin}}.php</span>
+                </script>
+
+                <script type="text/html" id="toolbar">
+                    <div class="layui-btn-container">
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="batch"><i
+                                class="layui-icon layui-icon-delete"></i>删除
+                        </button>
+                    </div>
+                </script>
+
+                <script type="text/html" id="operation-order">
+                    <div class="ant-space ant-space-horizontal ant-space-align-center" style="gap: 8px;">
+                        <div class="ant-space-item">
+                            <a class="layui-btn layui-btn-sm table-col-btn table-col-btn-danger" lay-event="del">删除</a>
+                        </div>
+                    </div>
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin', 'table', 'form', 'treetable', 'iconPicker', 'laytpl','laydate'], function () {
+        var $ = layui.$
+            , table = layui.table
+            , iconPicker = layui.iconPicker
+            , admin = layui.admin
+            , form = layui.form
+            , view = layui.view
+            , laydate = layui.laydate
+            , laytpl = layui.laytpl
+            , tree = layui.tree
+            , layer = layui.layer
+            , treetable = layui.treetable
+            , setter = layui.setter;
+        form.render();
+        table.render({
+            elem: '#table-content-order'
+            , url: setter.server.url + 'system/order/page'
+            , skin: 'line' //行边框风格
+            , size: 'lg'
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.message,
+                    "count": res.data.count,
+                    "data": res.data.list
+                };
+            }
+            , text: {
+                none: '<img class="empty-icon" alt="empty" src="res/style/imgs/empty.svg"><p>暂无相关数据</p>' //默认：无数据。
+            }
+            , response: {
+                statusCode: setter.response.statusCode.ok
+                , msgName: 'message'
+            }
+            , toolbar: '#toolbar' //开启头部工具栏，并为其绑定左侧模板
+            , title: '用户数据表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: '订单号', width: 150, fixed: 'left', unresize: true, sort: true}
+                , {field: 'trade_no', title: '交易号', width: 150, fixed: 'left', unresize: true, sort: true}
+                , {field: 'name', title: '订单描述', width: 200}
+                , {field: 'money', title: '金额', toolbar: '#money', width: 100, sort: true}
+                , {field: 'status', title: '状态', toolbar: '#status', width: 150}
+                , {field: 'status', title: '支付插件', toolbar: '#type', width: 150}
+                , {field: 'status', title: '插件文件', toolbar: '#plugin', width: 150}
+                , {field: 'updateTime', title: '结束时间', sort: true}
+                , {field: 'createTime', title: '创建时间', sort: true}
+                , {title: '操作', toolbar: '#operation-order', align: 'center', width: 150}
+            ]]
+            , page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(table-content-order)', function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case 'batch':
+                    var checkStatus = table.checkStatus('table-content-order')
+                        ,checkData = checkStatus.data; //得到选中的数据
+                    let req = {};
+                    for (var i in checkData) {  //遍历数组
+                        req[i]=checkData[i].id;
+                    }
+                    layer.confirm('真的删除选中数据吗?', function (index) {
+                        admin.req({
+                            url: setter.server.url + 'system/order/batch'
+                            , method: 'POST'
+                            , data: req
+                            , done: function (res) {
+                                layer.msg(res[setter.response.msgName], {'icon': 6});
+                                layui.table.reload('table-content-order'); //重载表格
+                                layer.close(index); //执行关闭
+                            }
+                        });
+                    });
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(table-content-order)', function (obj) {
+            let data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('真的删除此行吗', function (index) {
+                    admin.req({
+                        url: setter.server.url + 'system/order/del'
+                        , method: 'POST'
+                        , data: data
+                        , done: function (res) {
+                            layer.msg(res[setter.response.msgName], {'icon': 6});
+                            layui.table.reload('table-content-order'); //重载表格
+                            layer.close(index); //执行关闭
+                        }
+                    });
+                });
+            }
+        });
+        laydate.render({
+            elem: '#createTime'
+            ,type: 'datetime'
+            ,range: '到'
+        });
+        /**
+         * 字段搜索
+         */
+        form.on('submit(table-search)', function (res) {
+            var field = res.field; //获取提交的字段
+            //执行重载
+            table.reload('table-content-order', {
+                url: setter.server.url + 'system/order/page'
+                , methods: "post"
+                , where: field
+                , page: {
+                    curr: 1
+                }
+            });
+        });
+    });
+</script>

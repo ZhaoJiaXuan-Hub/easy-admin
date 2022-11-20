@@ -1,0 +1,66 @@
+
+<div class="layui-form layui-form-pane" lay-filter="table-form-menu" id="table-form-menu">
+  <div class="layui-form-item">
+    <label class="layui-form-label">上级菜单</label>
+    <div class="layui-input-block">
+      <script id="menus" type="text/html">
+        <select name="parentId" lay-verify="required">
+          <option value="0" {{#if (d.pid == 0) { }}selected{{# } }}>请选择上级菜单</option>
+          {{#  layui.each(d.list, function(index, item){ }}
+          <option value="{{item.menuId}}" {{#if (d.pid == item.menuId) { }}selected{{# } }}>{{item.title}}</option>
+          {{#  }); }}
+        </select>
+      </script>
+      <div id="view"></div>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">权限名称</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" name="title" value="{{= d.params.title || '' }}" lay-verify="required" autocomplete="off" placeholder="请输入权限名称" class="layui-input">
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">图标</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" id="iconPicker" name="icon" value="{{= d.params.icon || '' }}" lay-filter="iconPicker">
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">权限类型</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="radio" name="type" value="0" title="菜单" {{#if (d.params.type == 0 || d.params.type == undefined) { }}checked{{# } }}>
+        <input type="radio" name="type" value="1" title="接口" {{#if (d.params.type == 1) { }}checked{{# } }}>
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">是否可见</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="checkbox" name="hide" lay-skin="switch" lay-text="开启|关闭" {{#if (d.params.hide == 0 || d.params.hide == undefined) { }}checked{{# } }}>
+      </script>
+    </div>
+  </div>
+  <script type="text/html" template>
+  <div class="layui-form-item">
+    <label class="layui-form-label">路由地址</label>
+    <div class="layui-input-block">
+        <input type="text" name="path" value="{{= d.params.path || '' }}" autocomplete="off" placeholder="请输入路由地址" class="layui-input">
+    </div>
+  </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">接口地址</label>
+      <div class="layui-input-block">
+          <input type="text" name="authority" value="{{= d.params.authority
+   || '' }}" autocomplete="off" placeholder="请输入接口地址" class="layui-input">
+      </div>
+    </div>
+</script>
+  <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="table-form-menu-submit">立即提交</button>
+</div>

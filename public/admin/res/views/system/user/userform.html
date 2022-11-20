@@ -1,0 +1,45 @@
+
+<div class="layui-form layui-form-pane" lay-filter="table-form-user" id="table-form-user">
+  <div class="layui-form-item">
+    <label class="layui-form-label">角色</label>
+    <div class="layui-input-block">
+      <script id="roles" type="text/html">
+        <select name="roleId" lay-verify="required">
+          <option value="">请选择用户角色</option>
+          {{#  layui.each(d.list, function(index, item){ }}
+          <option value="{{item.roleId}}" {{#if (d.roleId == item.roleId) { }}selected{{# } }}>{{item.roleName}}</option>
+          {{#  }); }}
+        </select>
+      </script>
+      <div id="view"></div>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">用户名</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" name="username" value="{{= d.params.username || '' }}" lay-verify="required" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">邮箱账号</label>
+    <div class="layui-input-block">
+      <script type="text/html" template>
+        <input type="text" name="email" value="{{= d.params.email || '' }}" lay-verify="required|email" autocomplete="off" placeholder="请输入邮箱账号" class="layui-input">
+      </script>
+    </div>
+  </div>
+
+  <script type="text/html" template>
+  {{# if(d.params.password==null) { }}
+  <div class="layui-form-item">
+    <label class="layui-form-label">登录密码</label>
+    <div class="layui-input-block">
+        <input type="text" name="password" value="" lay-verify="required" autocomplete="off" placeholder="请输入登录密码" class="layui-input">
+    </div>
+  </div>
+  {{#  } }}
+  </script>
+  <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="table-form-user-submit">立即提交</button>
+</div>
