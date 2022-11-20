@@ -18,7 +18,7 @@ composer install
 
 # 界面预览
 ## 登录
-![微信截图_20221120122705](https://user-images.githubusercontent.com/38801805/202885782-f18059f0-0129-4271-9c30-04958824a3f9.png)
+![微信截图_20221120122705](https://user-images.githubusercontent.com/38801805/202885908-a07c65ee-3fa0-4d6a-b37a-dcc6caf31316.png)
 ## 角色管理
 ![微信截图_20221120122742](https://user-images.githubusercontent.com/38801805/202885791-4c50dde2-c5b6-4fb0-801e-c7d54b474176.png)
 ## 菜单权限管理
