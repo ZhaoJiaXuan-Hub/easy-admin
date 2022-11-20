@@ -1,5 +1,5 @@
 # easyAdmin
-使用高性能的webman框架开发的后台权限管理系统
+使用高性能的webman框架开发的后台权限管理系统 [国内镜像](https://gitee.com/ZhaoJiaXuan-Hub/easy-admin)
 
 # 使用
 ## 系统环境
